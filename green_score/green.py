@@ -423,6 +423,11 @@ def compute(model_name, refs, hyps, output_dir="."):
         if dist.get_rank() == 0:
             print("Distributed training with", torch.cuda.device_count(), "GPUs")
 
+    use_4bit = True
+    bnb_4bit_compute_dtype = "float16"
+    bnb_4bit_quant_type = "nf4"
+    use_nested_quant = False
+    compute_dtype = getattr(torch, bnb_4bit_compute_dtype)
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=use_4bit,
         bnb_4bit_quant_type=bnb_4bit_quant_type,
