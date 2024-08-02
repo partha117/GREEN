@@ -26,7 +26,8 @@ setup(
         'opencv-python',
         'scipy',
         'scikit-learn',
-        'pandas'
+        'pandas',
+        'bitsandbytes'
     ],
     python_requires=">=3.8",
     packages=find_packages(),
