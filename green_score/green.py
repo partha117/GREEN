@@ -1,7 +1,7 @@
 import re
 import torch
 import torch.distributed as dist
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 import pandas as pd
 from datasets import Dataset
 from datasets.distributed import split_dataset_by_node
@@ -423,10 +423,17 @@ def compute(model_name, refs, hyps, output_dir="."):
         if dist.get_rank() == 0:
             print("Distributed training with", torch.cuda.device_count(), "GPUs")
 
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=use_4bit,
+        bnb_4bit_quant_type=bnb_4bit_quant_type,
+        bnb_4bit_compute_dtype=compute_dtype,
+        bnb_4bit_use_double_quant=use_nested_quant
+    )
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         trust_remote_code=True,
-        device_map={"": "cuda:{}".format(torch.cuda.current_device())},
+        device_map="auto",
+        quantization_config=bnb_config,
         torch_dtype=torch.float16,
     )
     model.eval()
